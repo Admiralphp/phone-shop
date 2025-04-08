@@ -1,0 +1,100 @@
+version: '3.8'
+
+services:
+  api-gateway:
+    image: nginx:alpine
+    container_name: api-gateway
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    ports:
+      - "80:80"
+    depends_on:
+      - auth-service
+      - product-service
+      - order-service
+    networks:
+      - internal
+
+  auth-service:
+    build:
+      context: ./auth-service
+      dockerfile: Dockerfile
+    container_name: auth-service
+    environment:
+      - MONGO_URI=mongodb://auth-mongo:27017/authdb
+      - JWT_SECRET=supersecure
+    depends_on:
+      - auth-mongo
+    networks:
+      - internal
+
+  auth-mongo:
+    image: mongo:6
+    container_name: auth-mongo
+    volumes:
+      - auth_mongo_data:/data/db
+    networks:
+      - internal
+
+  product-service:
+    build:
+      context: ./product-service
+      dockerfile: Dockerfile
+    container_name: product-service
+    environment:
+      - POSTGRES_URI=postgres://postgres:postgres@product-db:5432/products
+    depends_on:
+      - product-db
+    networks:
+      - internal
+
+  product-db:
+    image: postgres:15
+    container_name: product-db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: products
+    volumes:
+      - product_pg_data:/var/lib/postgresql/data
+    networks:
+      - internal
+
+  order-service:
+    build:
+      context: ./order-service
+      dockerfile: Dockerfile
+    container_name: order-service
+    environment:
+      - MONGO_URI=mongodb://order-mongo:27017/orderdb
+    depends_on:
+      - order-mongo
+    networks:
+      - internal
+
+  order-mongo:
+    image: mongo:6
+    container_name: order-mongo
+    volumes:
+      - order_mongo_data:/data/db
+    networks:
+      - internal
+
+  admin-dashboard:
+    build:
+      context: ./admin-dashboard
+      dockerfile: Dockerfile
+    container_name: admin-dashboard
+    ports:
+      - "4200:80"
+    networks:
+      - internal
+
+volumes:
+  auth_mongo_data:
+  product_pg_data:
+  order_mongo_data:
+
+networks:
+  internal:
+    driver: bridge

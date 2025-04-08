@@ -1,0 +1,7 @@
+replicaCount: 1
+image:
+  repository: yourrepo/admin-dashboard
+  tag: latest
+service:
+  port: 80
+  targetPort: 80

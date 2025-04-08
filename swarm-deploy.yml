@@ -1,0 +1,102 @@
+version: '3.8'
+
+services:
+  api-gateway:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    networks:
+      - microservices_net
+    deploy:
+      mode: replicated
+      replicas: 2
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints: [node.role == manager]
+
+  auth-service:
+    build: ./auth-service
+    environment:
+      - MONGO_URI=mongodb://auth-mongo:27017/authdb
+      - JWT_SECRET=supersecure
+    networks:
+      - microservices_net
+    deploy:
+      mode: replicated
+      replicas: 2
+      update_config:
+        parallelism: 1
+        delay: 10s
+
+  auth-mongo:
+    image: mongo:6
+    volumes:
+      - auth_mongo_data:/data/db
+    networks:
+      - microservices_net
+    deploy:
+      placement:
+        constraints: [node.role == manager]
+
+  product-service:
+    build: ./product-service
+    environment:
+      - POSTGRES_URI=postgres://postgres:postgres@product-db:5432/products
+    networks:
+      - microservices_net
+    deploy:
+      replicas: 2
+
+  product-db:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: products
+    volumes:
+      - product_pg_data:/var/lib/postgresql/data
+    networks:
+      - microservices_net
+    deploy:
+      placement:
+        constraints: [node.role == manager]
+
+  order-service:
+    build: ./order-service
+    environment:
+      - MONGO_URI=mongodb://order-mongo:27017/orderdb
+    networks:
+      - microservices_net
+    deploy:
+      replicas: 2
+
+  order-mongo:
+    image: mongo:6
+    volumes:
+      - order_mongo_data:/data/db
+    networks:
+      - microservices_net
+    deploy:
+      placement:
+        constraints: [node.role == manager]
+
+  admin-dashboard:
+    build: ./admin-dashboard
+    ports:
+      - "4200:80"
+    networks:
+      - microservices_net
+    deploy:
+      replicas: 1
+
+volumes:
+  auth_mongo_data:
+  product_pg_data:
+  order_mongo_data:
+
+networks:
+  microservices_net:
+    external: true
