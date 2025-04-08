@@ -1,0 +1,56 @@
+version: '3.8'
+
+services:
+  order-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: order-service
+    ports:
+      - "${PORT}:${PORT}"
+    environment:
+      - NODE_ENV=${NODE_ENV}
+      - MONGODB_URI=${MONGODB_URI}
+      - PORT=${PORT}
+      - API_URL=${API_URL}
+    volumes:
+      - ./src:/usr/src/app/src
+      - ./node_modules:/usr/src/app/node_modules
+    depends_on:
+      - mongodb
+    networks:
+      - phone-accessories-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:${PORT}/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  mongodb:
+    image: mongo:5.0
+    container_name: order-service-mongodb
+    ports:
+      - "${MONGO_PORT}:27017"
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - phone-accessories-network
+    restart: unless-stopped
+    environment:
+      - MONGO_INITDB_DATABASE=order-service
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/order-service --quiet
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
+
+networks:
+  phone-accessories-network:
+    driver: bridge
+
+volumes:
+  mongodb_data:
+    driver: local
