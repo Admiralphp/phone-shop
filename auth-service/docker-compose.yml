@@ -1,0 +1,34 @@
+version: '3.8'
+
+services:
+  auth-service:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - PORT=3000
+      - MONGO_URI=mongodb://mongo:27017/auth
+      - JWT_SECRET=your_jwt_secret_key_here
+      - JWT_EXPIRES_IN=1d
+    depends_on:
+      - mongo
+    restart: unless-stopped
+    networks:
+      - phone-accessories-network
+
+  mongo:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    networks:
+      - phone-accessories-network
+
+networks:
+  phone-accessories-network:
+    driver: bridge
+
+volumes:
+  mongo-data:
