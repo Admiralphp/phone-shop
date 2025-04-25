@@ -101,7 +101,7 @@ func (r *productRepository) List(filter models.ProductFilter) (*models.Paginated
 		filter.PageSize = 20
 	}
 	offset := (filter.Page - 1) * filter.PageSize
-	
+
 	if err := query.Preload("Category").Offset(offset).Limit(filter.PageSize).Find(&products).Error; err != nil {
 		return nil, err
 	}
@@ -119,29 +119,29 @@ func (r *productRepository) List(filter models.ProductFilter) (*models.Paginated
 func (r *productRepository) Search(query string, page, pageSize int) (*models.PaginatedResponse, error) {
 	var products []models.Product
 	var totalItems int64
-	
+
 	searchQuery := "%" + query + "%"
-	
+
 	db := r.db.Model(&models.Product{}).
 		Where("name ILIKE ? OR description ILIKE ? OR sku ILIKE ?", searchQuery, searchQuery, searchQuery)
-	
+
 	if err := db.Count(&totalItems).Error; err != nil {
 		return nil, err
 	}
-	
+
 	if page < 1 {
 		page = 1
 	}
 	if pageSize < 1 {
 		pageSize = 20
 	}
-	
+
 	offset := (page - 1) * pageSize
-	
+
 	if err := db.Preload("Category").Offset(offset).Limit(pageSize).Find(&products).Error; err != nil {
 		return nil, err
 	}
-	
+
 	totalPages := int(math.Ceil(float64(totalItems) / float64(pageSize)))
 	return &models.PaginatedResponse{
 		Items:      products,
@@ -156,4 +156,3 @@ func (r *productRepository) UpdateStock(id uint, quantity int) error {
 	return r.db.Model(&models.Product{}).Where("id = ?", id).
 		Update("stock_level", gorm.Expr("stock_level + ?", quantity)).Error
 }
-

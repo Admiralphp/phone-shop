@@ -6,7 +6,7 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
-	
+
 	"phone-accessories/internal/service"
 )
 
@@ -37,24 +37,22 @@ func (h *SearchHandler) Search(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, ErrorResponse{Error: "Search query is required"})
 		return
 	}
-	
+
 	page, err := strconv.Atoi(c.DefaultQuery("page", "1"))
 	if err != nil || page < 1 {
 		page = 1
 	}
-	
+
 	pageSize, err := strconv.Atoi(c.DefaultQuery("pageSize", "20"))
 	if err != nil || pageSize < 1 {
 		pageSize = 20
 	}
-	
+
 	result, err := h.service.Search(query, page, pageSize)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, ErrorResponse{Error: err.Error()})
 		return
 	}
-	
+
 	c.JSON(http.StatusOK, result)
 }
-
-
