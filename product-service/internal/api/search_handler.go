@@ -7,7 +7,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	
-	"product-service/internal/service"
+	"phone-accessories/internal/service"
 )
 
 type SearchHandler struct {

@@ -9,7 +9,7 @@ import (
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 
-	"product-service/internal/models"
+	"phone-accessories/internal/models"
 )
 
 type ProductRepository interface {

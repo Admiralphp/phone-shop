@@ -18,7 +18,7 @@ services:
         constraints: [node.role == manager]
 
   auth-service:
-    build: ./auth-service
+    image: phone-shop-auth-service:latest
     environment:
       - MONGO_URI=mongodb://auth-mongo:27017/authdb
       - JWT_SECRET=supersecure
@@ -42,7 +42,7 @@ services:
         constraints: [node.role == manager]
 
   product-service:
-    build: ./product-service
+    image: phone-shop-product-service:latest
     environment:
       - POSTGRES_URI=postgres://postgres:postgres@product-db:5432/products
     networks:
@@ -65,7 +65,7 @@ services:
         constraints: [node.role == manager]
 
   order-service:
-    build: ./order-service
+    image: phone-shop-order-service:latest
     environment:
       - MONGO_URI=mongodb://order-mongo:27017/orderdb
     networks:
@@ -84,7 +84,7 @@ services:
         constraints: [node.role == manager]
 
   admin-dashboard:
-    build: ./admin-dashboard
+    image: phone-shop-admin-dashboard:latest
     ports:
       - "4200:80"
     networks:

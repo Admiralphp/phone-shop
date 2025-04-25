@@ -6,9 +6,9 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
-	
-	"product-service/internal/models"
-	"product-service/internal/service"
+
+	"phone-accessories/internal/models"
+	"phone-accessories/internal/service"
 )
 
 type ProductHandler struct {
@@ -44,7 +44,7 @@ func (h *ProductHandler) ListProducts(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, ErrorResponse{Error: "Invalid filter parameters"})
 		return
 	}
-	
+
 	// Set default values if not provided
 	if filter.Page <= 0 {
 		filter.Page = 1
@@ -52,13 +52,13 @@ func (h *ProductHandler) ListProducts(c *gin.Context) {
 	if filter.PageSize <= 0 {
 		filter.PageSize = 20
 	}
-	
+
 	result, err := h.service.ListProducts(filter)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, ErrorResponse{Error: err.Error()})
 		return
 	}
-	
+
 	c.JSON(http.StatusOK, result)
 }
 
@@ -79,13 +79,13 @@ func (h *ProductHandler) GetProduct(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, ErrorResponse{Error: "Invalid product ID"})
 		return
 	}
-	
+
 	product, err := h.service.GetProductByID(uint(id))
 	if err != nil {
 		c.JSON(http.StatusNotFound, ErrorResponse{Error: err.Error()})
 		return
 	}
-	
+
 	c.JSON(http.StatusOK, product)
 }
 
@@ -106,12 +106,12 @@ func (h *ProductHandler) CreateProduct(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, ErrorResponse{Error: "Invalid product data"})
 		return
 	}
-	
+
 	if err := h.service.CreateProduct(&product); err != nil {
 		c.JSON(http.StatusBadRequest, ErrorResponse{Error: err.Error()})
 		return
 	}
-	
+
 	c.JSON(http.StatusCreated, product)
 }
 
@@ -134,21 +134,21 @@ func (h *ProductHandler) UpdateProduct(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, ErrorResponse{Error: "Invalid product ID"})
 		return
 	}
-	
+
 	var product models.Product
 	if err := c.ShouldBindJSON(&product); err != nil {
 		c.JSON(http.StatusBadRequest, ErrorResponse{Error: "Invalid product data"})
 		return
 	}
-	
+
 	// Ensure the ID in the path matches the product
 	product.ID = uint(id)
-	
+
 	if err := h.service.UpdateProduct(&product); err != nil {
 		c.JSON(http.StatusBadRequest, ErrorResponse{Error: err.Error()})
 		return
 	}
-	
+
 	c.JSON(http.StatusOK, product)
 }
 
@@ -169,12 +169,12 @@ func (h *ProductHandler) DeleteProduct(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, ErrorResponse{Error: "Invalid product ID"})
 		return
 	}
-	
+
 	if err := h.service.DeleteProduct(uint(id)); err != nil {
 		c.JSON(http.StatusInternalServerError, ErrorResponse{Error: err.Error()})
 		return
 	}
-	
+
 	c.Status(http.StatusNoContent)
 }
 
@@ -201,24 +201,23 @@ func (h *ProductHandler) UpdateStock(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, ErrorResponse{Error: "Invalid product ID"})
 		return
 	}
-	
+
 	var req StockUpdateRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, ErrorResponse{Error: "Invalid stock update data"})
 		return
 	}
-	
+
 	if err := h.service.UpdateStock(uint(id), req.Quantity); err != nil {
 		c.JSON(http.StatusInternalServerError, ErrorResponse{Error: err.Error()})
 		return
 	}
-	
+
 	product, err := h.service.GetProductByID(uint(id))
 	if err != nil {
 		c.JSON(http.StatusNotFound, ErrorResponse{Error: err.Error()})
 		return
 	}
-	
+
 	c.JSON(http.StatusOK, product)
 }
-

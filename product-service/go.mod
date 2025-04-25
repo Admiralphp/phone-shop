@@ -1,7 +1,6 @@
-// go.mod
 module phone-accessories
 
-go 1.23
+go 1.22.0
 
 toolchain go1.23.6
 
@@ -10,9 +9,13 @@ require (
 	github.com/joho/godotenv v1.5.1
 	github.com/swaggo/files v1.0.1
 	github.com/swaggo/gin-swagger v1.6.0
+	github.com/swaggo/swag v1.16.2
 	gorm.io/driver/postgres v1.5.2
 	gorm.io/gorm v1.25.4
 )
+
+// Use an older compatible version of go-internal
+replace github.com/rogpeppe/go-internal => github.com/rogpeppe/go-internal v1.11.0
 
 require (
 	github.com/KyleBanks/depth v1.2.1 // indirect
@@ -44,7 +47,6 @@ require (
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/pelletier/go-toml/v2 v2.1.0 // indirect
 	github.com/rogpeppe/go-internal v1.14.1 // indirect
-	github.com/swaggo/swag v1.16.2 // indirect
 	github.com/twitchyliquid64/golang-asm v0.15.1 // indirect
 	github.com/ugorji/go/codec v1.2.11 // indirect
 	golang.org/x/arch v0.5.0 // indirect

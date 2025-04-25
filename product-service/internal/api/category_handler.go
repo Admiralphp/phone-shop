@@ -5,9 +5,9 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
-	
-	"product-service/internal/models"
-	"product-service/internal/service"
+
+	"phone-accessories/internal/models"
+	"phone-accessories/internal/service"
 )
 
 type CategoryHandler struct {
@@ -33,7 +33,7 @@ func (h *CategoryHandler) ListCategories(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, ErrorResponse{Error: err.Error()})
 		return
 	}
-	
+
 	c.JSON(http.StatusOK, categories)
 }
 
@@ -54,13 +54,13 @@ func (h *CategoryHandler) GetCategory(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, ErrorResponse{Error: "Invalid category ID"})
 		return
 	}
-	
+
 	category, err := h.service.GetCategoryByID(uint(id))
 	if err != nil {
 		c.JSON(http.StatusNotFound, ErrorResponse{Error: err.Error()})
 		return
 	}
-	
+
 	c.JSON(http.StatusOK, category)
 }
 
@@ -81,12 +81,12 @@ func (h *CategoryHandler) CreateCategory(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, ErrorResponse{Error: "Invalid category data"})
 		return
 	}
-	
+
 	if err := h.service.CreateCategory(&category); err != nil {
 		c.JSON(http.StatusBadRequest, ErrorResponse{Error: err.Error()})
 		return
 	}
-	
+
 	c.JSON(http.StatusCreated, category)
 }
 
@@ -109,21 +109,21 @@ func (h *CategoryHandler) UpdateCategory(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, ErrorResponse{Error: "Invalid category ID"})
 		return
 	}
-	
+
 	var category models.Category
 	if err := c.ShouldBindJSON(&category); err != nil {
 		c.JSON(http.StatusBadRequest, ErrorResponse{Error: "Invalid category data"})
 		return
 	}
-	
+
 	// Ensure the ID in the path matches the category
 	category.ID = uint(id)
-	
+
 	if err := h.service.UpdateCategory(&category); err != nil {
 		c.JSON(http.StatusBadRequest, ErrorResponse{Error: err.Error()})
 		return
 	}
-	
+
 	c.JSON(http.StatusOK, category)
 }
 
@@ -144,11 +144,11 @@ func (h *CategoryHandler) DeleteCategory(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, ErrorResponse{Error: "Invalid category ID"})
 		return
 	}
-	
+
 	if err := h.service.DeleteCategory(uint(id)); err != nil {
 		c.JSON(http.StatusInternalServerError, ErrorResponse{Error: err.Error()})
 		return
 	}
-	
+
 	c.Status(http.StatusNoContent)
 }

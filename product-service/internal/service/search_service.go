@@ -2,8 +2,8 @@
 package service
 
 import (
-	"product-service/internal/models"
-	"product-service/internal/repository"
+	"phone-accessories/internal/models"
+	"phone-accessories/internal/repository"
 )
 
 type SearchService interface {

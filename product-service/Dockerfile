@@ -1,5 +1,5 @@
 # Use the official Golang image to build the app
-FROM golang:1.23-alpine as builder
+FROM golang:1.22-alpine as builder
 
 # Set the environment variable for Go modules and GOPATH
 ENV GO111MODULE=on
@@ -7,7 +7,7 @@ ENV GOPATH=/go
 ENV PATH=$PATH:$GOPATH/bin
 
 # Set the working directory inside the container
-WORKDIR /go/src/product-service
+WORKDIR /go/src/phone-accessories
 
 # Copy the go.mod and go.sum files
 COPY go.mod go.sum ./
@@ -19,7 +19,7 @@ RUN go mod download
 COPY . .
 
 # Install swag for generating swagger docs
-RUN go install github.com/swaggo/swag/cmd/swag@latest
+RUN go install github.com/swaggo/swag/cmd/swag@v1.16.1
 
 # Generate the swagger docs
 RUN swag init
@@ -37,8 +37,8 @@ RUN apk --no-cache add ca-certificates tzdata
 WORKDIR /app
 
 # Copy the binary and swagger docs from the builder stage
-COPY --from=builder /go/src/product-service/product-service /app/
-COPY --from=builder /go/src/product-service/docs /app/docs/
+COPY --from=builder /go/src/phone-accessories/product-service /app/
+COPY --from=builder /go/src/phone-accessories/docs /app/docs/
 
 # Expose the required port (if needed)
 EXPOSE 8080

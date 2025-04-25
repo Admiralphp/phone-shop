@@ -6,7 +6,7 @@ import (
 
 	"gorm.io/gorm"
 
-	"product-service/internal/models"
+	"phone-accessories/internal/models"
 )
 
 type CategoryRepository interface {

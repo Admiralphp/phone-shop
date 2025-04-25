@@ -18,12 +18,12 @@ import (
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 
-	_ "product-service/docs"
-	"product-service/internal/api"
-	"product-service/internal/config"
-	"product-service/internal/models"
-	"product-service/internal/repository"
-	"product-service/internal/service"
+	_ "phone-accessories/docs"
+	"phone-accessories/internal/api"
+	"phone-accessories/internal/config"
+	"phone-accessories/internal/models"
+	"phone-accessories/internal/repository"
+	"phone-accessories/internal/service"
 )
 
 // @title           Phone Accessories Product Service API
@@ -116,23 +116,23 @@ func main() {
 func setupDatabase(cfg *config.Config) (*gorm.DB, error) {
 	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable TimeZone=UTC",
 		cfg.DBHost, cfg.DBUser, cfg.DBPassword, cfg.DBName, cfg.DBPort)
-	
+
 	// Try to connect with exponential backoff
 	var db *gorm.DB
 	var err error
 	maxRetries := 5
-	
+
 	for i := 0; i < maxRetries; i++ {
 		db, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
 		if err == nil {
 			break
 		}
-		
+
 		retryDelay := time.Duration(1<<uint(i)) * time.Second
-		log.Printf("Failed to connect to database (attempt %d/%d): %v. Retrying in %v...", 
+		log.Printf("Failed to connect to database (attempt %d/%d): %v. Retrying in %v...",
 			i+1, maxRetries, err, retryDelay)
 		time.Sleep(retryDelay)
 	}
-	
+
 	return db, err
 }

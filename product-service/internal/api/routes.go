@@ -4,7 +4,7 @@ package api
 import (
 	"github.com/gin-gonic/gin"
 	
-	"product-service/internal/service"
+	"phone-accessories/internal/service"
 )
 
 func SetupRoutes(router *gin.Engine, 
