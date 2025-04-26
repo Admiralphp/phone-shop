@@ -19,20 +19,20 @@ func main() {
 	dbUser := "postgres"
 	dbPassword := "postgres"
 	dbName := "product_service"
-	
-	// Construction de la chaîne de connexion à la base de données avec paramètre client_encoding
-	dbURL := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable client_encoding=UTF8",
+
+	// Construction de la chaîne de connexion à la base de données
+	dbURL := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
 		dbHost, dbPort, dbUser, dbPassword, dbName)
-	
+
 	fmt.Println("Connexion à la base de données PostgreSQL...")
 	fmt.Printf("Hôte: %s, Port: %s, Base de données: %s\n", dbHost, dbPort, dbName)
-	
+
 	// Connexion à la base de données
 	db, err := gorm.Open(postgres.Open(dbURL), &gorm.Config{})
 	if err != nil {
 		log.Fatalf("Impossible de se connecter à la base de données: %v", err)
 	}
-	
+
 	fmt.Println("Connexion à la base de données réussie.")
 
 	// Migration des tables
@@ -56,14 +56,7 @@ func main() {
 
 		// Suppression des données existantes
 		fmt.Println("Suppression des données existantes...")
-		// Désactiver les contraintes de clés étrangères temporairement
-		db.Exec("SET CONSTRAINTS ALL DEFERRED")
-		// Supprimer les données des tables
-		db.Exec("DELETE FROM products")
-		db.Exec("DELETE FROM categories")
-		// Réinitialiser les séquences d'auto-incrémentation
-		db.Exec("ALTER SEQUENCE products_id_seq RESTART WITH 1")
-		db.Exec("ALTER SEQUENCE categories_id_seq RESTART WITH 1")
+		db.Exec("TRUNCATE products, categories CASCADE")
 		fmt.Println("Données existantes supprimées.")
 	}
 
@@ -188,13 +181,13 @@ func main() {
 			ImageURL:    "https://example.com/images/products/wireless-earbuds.jpg",
 			CategoryID:  categories[2].ID,
 			Attributes: models.JSON{
-				"type":        "True Wireless",
-				"battery":     "6 heures",
-				"waterproof":  "IPX5",
-				"microphone":  true,
-				"noise_canc":  true,
+				"type":         "True Wireless",
+				"battery":      "6 heures",
+				"waterproof":   "IPX5",
+				"microphone":   true,
+				"noise_canc":   true,
 				"connectivity": "Bluetooth 5.2",
-				"features":    []string{"Réduction de bruit", "Commandes tactiles", "Assistant vocal"},
+				"features":     []string{"Réduction de bruit", "Commandes tactiles", "Assistant vocal"},
 			},
 			IsActive: true,
 		},
